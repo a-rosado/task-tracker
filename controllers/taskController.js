@@ -44,4 +44,34 @@ const deleteTask = async (req, res) => {
   }
 };
 
-module.exports = { getAllTasks, createTask, deleteTask };
+const updateTask = async (req, res) => {
+    try {
+
+      const { id } = req.params; // Get task ID from the route parameter
+      const updates = req.body; // Get the fields to update from the request body
+  
+      if (!id) {
+
+        return res.status(400).json({ error: 'Task ID is required' });
+      }
+  
+      if (!updates.title || updates.title.trim() === '') {
+        return res.status(400).json({ error: 'Task title is required' });
+      }
+  
+      const updatedTask = await Task.update(id, updates); // Assuming `Task.update` exists in your model
+      if (updatedTask) {
+        console.log('Updated Task:', updatedTask);
+        res.status(200).json({ message: 'Task updated successfully', updatedTask });
+      } else {
+        console.warn('Task not found for ID:', id);
+        res.status(404).json({ error: 'Task not found' });
+      }
+    } catch (err) {
+      console.error('Error Updating Task:', err);
+      res.status(500).json({ error: 'Failed to update task', details: err.message });
+    }
+  };
+  
+
+module.exports = { getAllTasks, createTask, deleteTask, updateTask };
